@@ -1,4 +1,3 @@
-use std::mem;
 use std::slice;
 use std::str;
 use std::ops::Deref;
@@ -28,14 +27,14 @@ macro_rules! integer_impl(
                 Ok(PushGuard { lua: lua, size: 1, raw_lua: raw_lua })
             }
         }
-        
+
         impl<'lua, L> PushOne<L> for $t where L: AsMutLua<'lua> {
         }
 
         impl<'lua, L> LuaRead<L> for $t where L: AsLua<'lua> {
             #[inline]
             fn lua_read_at_position(lua: L, index: i32) -> Result<$t, L> {
-                let mut success = unsafe { mem::uninitialized() };
+                let mut success = 0;
                 let val = unsafe { ffi::lua_tointegerx(lua.as_lua().0, index, &mut success) };
                 match success {
                     0 => Err(lua),
@@ -63,14 +62,14 @@ macro_rules! unsigned_impl(
                 Ok(PushGuard { lua: lua, size: 1, raw_lua: raw_lua })
             }
         }
-        
+
         impl<'lua, L> PushOne<L> for $t where L: AsMutLua<'lua> {
         }
 
         impl<'lua, L> LuaRead<L> for $t where L: AsLua<'lua> {
             #[inline]
             fn lua_read_at_position(lua: L, index: i32) -> Result<$t, L> {
-                let mut success = unsafe { mem::uninitialized() };
+                let mut success = 0;
                 let val = unsafe { ffi::lua_tounsignedx(lua.as_lua().0, index, &mut success) };
                 match success {
                     0 => Err(lua),
@@ -98,14 +97,14 @@ macro_rules! numeric_impl(
                 Ok(PushGuard { lua: lua, size: 1, raw_lua: raw_lua })
             }
         }
-        
+
         impl<'lua, L> PushOne<L> for $t where L: AsMutLua<'lua> {
         }
 
         impl<'lua, L> LuaRead<L> for $t where L: AsLua<'lua> {
             #[inline]
             fn lua_read_at_position(lua: L, index: i32) -> Result<$t, L> {
-                let mut success = unsafe { mem::uninitialized() };
+                let mut success = 0;
                 let val = unsafe { ffi::lua_tonumberx(lua.as_lua().0, index, &mut success) };
                 match success {
                     0 => Err(lua),
@@ -148,7 +147,7 @@ impl<'lua, L> LuaRead<L> for String
 {
     #[inline]
     fn lua_read_at_position(lua: L, index: i32) -> Result<String, L> {
-        let mut size: libc::size_t = unsafe { mem::uninitialized() };
+        let mut size: libc::size_t = 0;
         let c_str_raw = unsafe { ffi::lua_tolstring(lua.as_lua().0, index, &mut size) };
         if c_str_raw.is_null() {
             return Err(lua);
@@ -191,7 +190,7 @@ impl<'lua, L> LuaRead<L> for AnyLuaString
 {
     #[inline]
     fn lua_read_at_position(lua: L, index: i32) -> Result<AnyLuaString, L> {
-        let mut size: libc::size_t = unsafe { mem::uninitialized() };
+        let mut size: libc::size_t = 0;
         let c_str_raw = unsafe { ffi::lua_tolstring(lua.as_lua().0, index, &mut size) };
         if c_str_raw.is_null() {
             return Err(lua);
@@ -254,7 +253,7 @@ impl<'lua, L> LuaRead<L> for StringInLua<L>
 {
     #[inline]
     fn lua_read_at_position(lua: L, index: i32) -> Result<StringInLua<L>, L> {
-        let mut size: libc::size_t = unsafe { mem::uninitialized() };
+        let mut size: libc::size_t = 0;
         let c_str_raw = unsafe { ffi::lua_tolstring(lua.as_lua().0, index, &mut size) };
         if c_str_raw.is_null() {
             return Err(lua);
@@ -504,7 +503,7 @@ mod tests {
             let x: StringInLua<_> = lua.get("a").unwrap();
             assert_eq!(&*x, "aaa");
         }
-        
+
         lua.set("a", 18);
         {
             let x: StringInLua<_> = lua.get("a").unwrap();
