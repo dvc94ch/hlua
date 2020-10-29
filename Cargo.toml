@@ -1,2 +1,2 @@
 [workspace]
-members = ["hlua", "lua52-sys"]
+members = ["derive", "hlua", "lua52-sys"]

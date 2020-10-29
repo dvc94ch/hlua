@@ -1,0 +1,14 @@
+[package]
+name = "hlua-derive"
+version = "0.1.0"
+authors = [ "david@craven.ch", "pierre.krieger1708@gmail.com" ]
+edition = "2018"
+
+[lib]
+proc_macro = true
+
+[dependencies]
+hlua = { path = "../hlua" }
+proc-macro-error = "1.0.4"
+quote = "1.0.7"
+syn = { version = "1.0.48", features = ["full"] }
