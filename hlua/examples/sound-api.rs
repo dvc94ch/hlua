@@ -30,6 +30,7 @@ fn main() {
 }
 
 // this `Sound` struct is the object that we will use to demonstrate hlua
+#[derive(Clone)]
 struct Sound {
     playing: bool,
 }

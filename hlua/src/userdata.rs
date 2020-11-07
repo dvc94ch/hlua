@@ -14,7 +14,6 @@ use LuaRead;
 use Push;
 use PushGuard;
 
-use InsideCallback;
 use LuaTable;
 
 // Called when an object inside Lua is being dropped.
@@ -122,12 +121,10 @@ where
 
 ///
 #[inline]
-pub fn read_userdata<'t, 'c, T>(
-    lua: &'c mut InsideCallback,
-    index: i32,
-) -> Result<&'t mut T, &'c mut InsideCallback>
+pub fn read_userdata<'t, 'lua, T, L>(lua: L, index: i32) -> Result<&'t mut T, L>
 where
     T: 'static + Any,
+    L: AsLua<'lua>,
 {
     unsafe {
         let data_ptr = ffi::lua_touserdata(lua.as_lua().0, index);

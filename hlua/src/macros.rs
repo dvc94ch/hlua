@@ -25,8 +25,7 @@ macro_rules! implement_lua_read {
                 lua: &'c mut hlua::InsideCallback,
                 index: i32,
             ) -> Result<&'s mut $ty, &'c mut hlua::InsideCallback> {
-                // FIXME:
-                unsafe { ::std::mem::transmute($crate::read_userdata::<$ty>(lua, index)) }
+                $crate::read_userdata::<$ty, _>(lua, index)
             }
         }
 
@@ -36,8 +35,7 @@ macro_rules! implement_lua_read {
                 lua: &'c mut hlua::InsideCallback,
                 index: i32,
             ) -> Result<&'s $ty, &'c mut hlua::InsideCallback> {
-                // FIXME:
-                unsafe { ::std::mem::transmute($crate::read_userdata::<$ty>(lua, index)) }
+                Ok($crate::read_userdata::<$ty, _>(lua, index)?)
             }
         }
 
@@ -70,6 +68,19 @@ macro_rules! implement_lua_read {
                     Ok(x) => Ok(x),
                     _ => Err(lua),
                 }
+            }
+        }
+
+        impl<'a, 'lua, L: hlua::AsMutLua<'lua>> hlua::LuaRead<hlua::PushGuard<&'a mut L>> for $ty
+        where
+            $ty: Clone,
+        {
+            #[inline]
+            fn lua_read_at_position(
+                lua: hlua::PushGuard<&'a mut L>,
+                index: i32,
+            ) -> Result<$ty, hlua::PushGuard<&'a mut L>> {
+                Ok($crate::read_userdata::<$ty, _>(lua, index)?.clone())
             }
         }
     };
