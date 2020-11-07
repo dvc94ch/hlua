@@ -10,5 +10,6 @@ proc_macro = true
 [dependencies]
 hlua = { path = "../hlua" }
 proc-macro-error = "1.0.4"
+proc-macro2 = "1.0.24"
 quote = "1.0.7"
 syn = { version = "1.0.48", features = ["full"] }
