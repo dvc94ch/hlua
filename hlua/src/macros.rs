@@ -71,15 +71,15 @@ macro_rules! implement_lua_read {
             }
         }
 
-        impl<'a, 'lua, L: hlua::AsMutLua<'lua>> hlua::LuaRead<hlua::PushGuard<&'a mut L>> for $ty
+        impl<'lua, L: hlua::AsMutLua<'lua>> hlua::LuaRead<L> for $ty
         where
             $ty: Clone,
         {
             #[inline]
             fn lua_read_at_position(
-                lua: hlua::PushGuard<&'a mut L>,
+                lua: L,
                 index: i32,
-            ) -> Result<$ty, hlua::PushGuard<&'a mut L>> {
+            ) -> Result<$ty, L> {
                 Ok($crate::read_userdata::<$ty, _>(lua, index)?.clone())
             }
         }
