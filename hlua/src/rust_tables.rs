@@ -1,4 +1,4 @@
-use any::{AnyHashableLuaValue, AnyLuaValue};
+use any::{AnyLuaValue};
 use ffi;
 
 use AsMutLua;
@@ -197,8 +197,10 @@ where
 {
 }
 
-impl<'lua, L> LuaRead<L> for HashMap<AnyHashableLuaValue, AnyLuaValue>
+impl<'lua, L, K, V> LuaRead<L> for HashMap<K, V>
 where
+    K: for<'a> LuaRead<&'a mut L> + std::hash::Hash + Eq + 'static,
+    V: for<'a> LuaRead<&'a mut L> + 'static,
     L: AsMutLua<'lua>,
 {
     // TODO: this should be implemented using the LuaTable API instead of raw Lua calls.
@@ -214,7 +216,7 @@ where
             }
 
             let key = {
-                let maybe_key: Option<AnyHashableLuaValue> =
+                let maybe_key: Option<K> =
                     LuaRead::lua_read_at_position(&mut me, -2).ok();
                 match maybe_key {
                     None => {
@@ -226,7 +228,7 @@ where
                 }
             };
 
-            let value: AnyLuaValue = LuaRead::lua_read_at_position(&mut me, -1).ok().unwrap();
+            let value: V = LuaRead::lua_read_at_position(&mut me, -1).ok().unwrap();
 
             unsafe { ffi::lua_pop(me.as_mut_lua().0, 1) };
 
